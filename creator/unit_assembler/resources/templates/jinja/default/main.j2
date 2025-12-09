@@ -1,0 +1,178 @@
+{
+  "presentation": {
+    "slides": [
+      {
+        "elements": [
+          {
+            "x": 0,
+            "y": 17.214148308494753,
+            "width": 100,
+            "height": 38.590677677983535,
+            "action": {
+                "library": "H5P.Shape 1.0",
+                "params": {
+                "shape": {
+                    "fillColor": "rgb(156, 13, 13)",
+                    "borderWidth": 0,
+                    "borderStyle": "solid",
+                    "borderColor": "rgba(0, 0, 0, 0)",
+                    "borderRadius": 0
+                },
+                "type": "rectangle",
+                "line": {
+                    "borderColor": "#000000",
+                    "borderWidth": "1",
+                    "borderStyle": "solid"
+                }
+                },
+                "subContentId": "91e13f93-0ea4-47a0-b2b4-b1bea0e9eeb0",
+                "metadata": { "contentType": "Shapes" }
+            },
+            "backgroundOpacity": 0,
+            "displayAsButton": false,
+            "buttonSize": "big",
+            "goToSlideType": "specified",
+            "invisible": false
+          },
+          {
+            "x": 2.178649237472767,
+            "y": 23.669453924180285,
+            "width": 95.86056644880175,
+            "height": 19.365916847056596,
+            "action": {
+                "library": "H5P.AdvancedText 1.1",
+                "params": {
+                "text": {{("<h2 style=\"color:#ecf0f1\">"~title~"</h2>\n") | tojson }}
+                },
+                "subContentId": "3f7c7ce8-cd34-4e84-993d-22bb13897edf",
+                "metadata": {
+                "contentType": "Text",
+                "license": "U",
+                "title": "Untitled Text",
+                "authors": [],
+                "changes": []
+                }
+            },
+            "alwaysDisplayComments": false,
+            "backgroundOpacity": 0,
+            "displayAsButton": false,
+            "buttonSize": "big",
+            "goToSlideType": "specified",
+            "invisible": false,
+            "solution": ""
+          },
+          {
+            "x": 0,
+            "y": 58.09775054116979,
+            "width": 42.48366013071895,
+            "height": 5.164244492548426,
+            "action": {
+                "library": "H5P.AdvancedText 1.1",
+                "params": {
+                "text": "<p><span style=\"font-size:0.75em\"><span style=\"color:#ecf0f1\"><span style=\"background-color:#2980b9\">    Cybersecurity</span></span></span></p>\n"
+                },
+                "metadata": {
+                "contentType": "Text",
+                "license": "U",
+                "title": "Untitled Text",
+                "authors": [],
+                "changes": []
+                },
+                "subContentId": "c00c1643-413c-424e-8a1b-645622d000d6"
+            },
+            "alwaysDisplayComments": false,
+            "backgroundOpacity": 0,
+            "displayAsButton": false,
+            "buttonSize": "big",
+            "goToSlideType": "specified",
+            "invisible": false,
+            "solution": ""
+          }
+        ],
+        "slideBackgroundSelector": {},
+        "keywords": []
+      },
+      {% for slide in slides %}
+      {%include "slide.j2" with context%}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ],
+    "keywordListEnabled": true,
+    "globalBackgroundSelector": {
+      "fillGlobalBackground": "{{bg_color}}"
+    },
+    "keywordListAlwaysShow": false,
+    "keywordListAutoHide": false,
+    "keywordListOpacity": 90
+  },
+  "override": {
+    "activeSurface": false,
+    "hideSummarySlide": false,
+    "summarySlideSolutionButton": true,
+    "summarySlideRetryButton": true,
+    "enablePrintButton": false,
+    "social": {
+      "showFacebookShare": false,
+      "facebookShare": {
+        "url": "@currentpageurl",
+        "quote": "Ich habe @score von @maxScore Punkten bei der Aufgabe @currentpageurl erreicht."
+      },
+      "showTwitterShare": false,
+      "twitterShare": {
+        "statement": "Ich habe @score von @maxScore Punkten bei der Aufgabe @currentpageurl erreicht.",
+        "url": "@currentpageurl",
+        "hashtags": "h5p, Kurs"
+      },
+      "showGoogleShare": false,
+      "googleShareUrl": "@currentpageurl"
+    }
+  },
+  "l10n": {
+    "slide": "Folie",
+    "score": "Punktzahl",
+    "yourScore": "Deine Punktzahl",
+    "maxScore": "Maximale Punktzahl",
+    "total": "Summe",
+    "totalScore": "Gesamtpunktzahl",
+    "showSolutions": "Lösungen anzeigen",
+    "retry": "Wiederholen",
+    "exportAnswers": "Text exportieren",
+    "hideKeywords": "Stichwortliste verbergen",
+    "showKeywords": "Stichwortliste anzeigen",
+    "fullscreen": "Vollbild",
+    "exitFullscreen": "Vollbild beenden",
+    "prevSlide": "Vorherige Folie",
+    "nextSlide": "Nächste Folie",
+    "currentSlide": "Aktuelle Folie",
+    "lastSlide": "Letzte Folie",
+    "solutionModeTitle": "Lösungsmodus beenden",
+    "solutionModeText": "Lösungsmodus",
+    "summaryMultipleTaskText": "Mehrere Aufgaben",
+    "scoreMessage": "Du hast erreicht:",
+    "shareFacebook": "Auf Facebook teilen",
+    "shareTwitter": "Auf Twitter teilen",
+    "shareGoogle": "Auf Google+ teilen",
+    "summary": "Zusammenfassung",
+    "solutionsButtonTitle": "Kommentare anzeigen",
+    "printTitle": "Drucken",
+    "printIngress": "Wie möchtest du diese Präsentation drucken?",
+    "printAllSlides": "Alle Folien drucken",
+    "printCurrentSlide": "Aktuelle Folie drucken",
+    "noTitle": "Kein Titel",
+    "accessibilitySlideNavigationExplanation": "Verwende die linke oder rechte Cursortaste, um zur Folie in der jeweiligen Richtung zu blättern, wenn der Präsentationsbereich ausgewählt ist.",
+    "accessibilityCanvasLabel": "Präsentationsbereich. Verwende die linke oder rechte Cursortaste, um zwischen den Folien zu navigieren.",
+    "accessibilityProgressBarLabel": "Wähle das zu zeigende Schaubild",
+    "containsNotCompleted": "@slideName enthält eine nicht abgeschlossene Interaktion",
+    "containsCompleted": "@slideName wurde abgeschlossen",
+    "slideCount": "Folie @index von @total",
+    "containsOnlyCorrect": "@slideName enthält nur richtige Antworten",
+    "containsIncorrectAnswers": "@slideName enthält falsche Antworten",
+    "shareResult": "Ergebnis teilen",
+    "accessibilityTotalScore": "Du hast insgesamt @score von @maxScore Punkten erreicht.",
+    "accessibilityEnteredFullscreen": "Vollbild aktiviert",
+    "accessibilityExitedFullscreen": "Vollbild deaktiviert",
+    "confirmDialogHeader": "Antworten übermitteln",
+    "confirmDialogText": "Damit werden deine Ergebnisse übermittelt. Möchtest du fortfahren?",
+    "confirmDialogConfirmText": "Senden und Ergebnisse ansehen",
+    "slideshowNavigationLabel": "Schaubild-Navigation"
+  }
+}
