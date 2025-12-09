@@ -1,0 +1,17 @@
+settings:
+  jinja_templates_path: "/default"
+  unit_template_path: "/default"
+    
+defaults:
+  unit_title: "Unit"
+  
+slide_types:
+  text:
+    template_key: "text" 
+
+  single_choice:
+    template_key: "single_choice"
+    preprocess: "single_choice"
+
+  drag_text:
+    template_key: "drag_text"

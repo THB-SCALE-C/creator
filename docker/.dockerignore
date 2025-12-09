@@ -1,8 +1,0 @@
-# Python
-__pycache__/
-.vscode/
-__deploy.py
-.env
-.feedback
-.logs
-_backup_feedback.py

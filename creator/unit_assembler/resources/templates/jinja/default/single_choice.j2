@@ -1,0 +1,54 @@
+{
+    "library": "H5P.SingleChoiceSet 1.11",
+    "params": {
+    "overallFeedback": [
+        {
+        "from": 0,
+        "to": 50,
+        "feedback": "{{negative_feedback | safe}}"
+        },
+        {
+        "from": 51,
+        "to": 100,
+        "feedback": "{{positive_feedback | safe}}"
+        }
+    ],
+    "behaviour": {
+        "autoContinue": true,
+        "timeoutCorrect": 2000,
+        "timeoutWrong": 3000,
+        "soundEffectsEnabled": true,
+        "enableRetry": true,
+        "enableSolutionsButton": true,
+        "passPercentage": 100
+    },
+    "l10n": {
+        "nextButtonLabel": "Weiter",
+        "showSolutionButtonLabel": "Lösung anzeigen",
+        "retryButtonLabel": "Wiederholen",
+        "solutionViewTitle": "Lösung",
+        "correctText": "Richtig!",
+        "incorrectText": "Falsch!",
+        "shouldSelect": "Hätte gewählt werden müssen",
+        "shouldNotSelect": "Hätte nicht gewählt werden sollen",
+        "muteButtonLabel": "Stumm schalten",
+        "closeButtonLabel": "Schließen",
+        "slideOfTotal": "Seite :num von :total",
+        "scoreBarLabel": "Du hast :num von :total Punkten erreicht.",
+        "solutionListQuestionNumber": "Frage :num",
+        "a11yShowSolution": "Die Lösung anzeigen. Die richtigen Lösungen werden in der Aufgabe angezeigt.",
+        "a11yRetry": "Die Aufgabe wiederholen. Alle Versuche werden zurückgesetzt und die Aufgabe wird erneut gestartet."
+    },
+    "choices": [
+        {% for choice in choices %}
+            {{choice|tojson}}{% if not loop.last %},{% endif %}
+        {% endfor %} 
+    ]
+    },
+    "subContentId": "{{uuid}}",
+    "metadata": {
+    "contentType": "Single Choice Set",
+    "license": "U",
+    "title": "Teste Dein Wissen!"
+    }
+}
