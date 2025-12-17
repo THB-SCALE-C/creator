@@ -3,4 +3,5 @@ __pycache__
 .out/
 unit_assembler/
 __*
+!__init__.py
 test.*
