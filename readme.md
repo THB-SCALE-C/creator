@@ -35,6 +35,9 @@ print(f"H5P ready at {package_path}")
 - `creator.unit_assembler` renders generated slides into H5P assets (configuration in `unit_assembler/config.yml`).
 - `creator.llm` provides `create_openrouter_lm` if you need a standalone LM instance.
 
-## Notes for SCALE-C integration
+## SCALE-C integration
 - The package is importable as `creator` and keeps artifacts under `.out/` by default.
 - You can inspect `Creator.system_prompt`, `Creator.raw_response`, or `Creator.history` for debugging generation traces.
+
+## Note
+This repository includes free and open-source H5P libraries redistributed under their respective licenses.
