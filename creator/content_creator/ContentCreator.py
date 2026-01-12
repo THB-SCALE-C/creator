@@ -125,10 +125,11 @@ class ContentCreator:
         if self._lu_sig:
             warn("learning unit signature already set! Overwritting...")
         if free_choice:
-            _types = [MAP_R[slide["type"]] for slide in slides]
+            _types = tuple([MAP_R[slide["type"]] for slide in slides])
             _slide_type = Union[_types]
             self._lu_sig = self._default_unit.insert(-1, "slides",
-                                                     dspy.OutputField(desc=f"For the possible slides types, take in regard these instructions:\n\n {"\n\n".join([f'##{slide["name"]}\n{slide["desc"]}' for slide in slides])}"), list[_slide_type])
+                                                     dspy.OutputField(desc=f"For the possible slides types, take in regard these instructions:\n\n {"\n\n".join([f'##{slide["name"]}\n{slide["desc"]}' for slide in slides])}"), 
+                                                     list[_slide_type])
         else:
             self._lu_sig = self._default_unit.insert(-1, "slides",
                                                      dspy.OutputField(), _to_signature(slides))
