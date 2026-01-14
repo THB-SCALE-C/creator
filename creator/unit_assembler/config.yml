@@ -1,6 +1,6 @@
 settings:
-  jinja_templates_path: "/default"
-  unit_template_path: "/default"
+  jinja_templates_path: "/default/jinja"
+  unit_template_path: "/default/unit"
     
 defaults:
   unit_title: "Unit"
