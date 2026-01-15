@@ -3,7 +3,7 @@ import os
 from typing import Any, List, Optional
 from langchain_openai import ChatOpenAI
 from pydantic import SecretStr, ValidationError
-from langchain.schema import SystemMessage
+from langchain.messages import SystemMessage
 
 from .utils.logger import setup_logger
 from .utils.zip_folder import zip_folder
