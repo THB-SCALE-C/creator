@@ -28,23 +28,7 @@ def zip_folder(folder_path: str, contents:Sequence[Content]) -> bytes:
     return buffer.getvalue()
 
 
-
-@contextmanager
-def load_zip_as_context(zip_path: str):
-    temp_dir = tempfile.mkdtemp()
-    try:
-        with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(temp_dir)
-        yield Path(temp_dir)
-    finally:
-        shutil.rmtree(temp_dir)
-
-
-def load_zip_to_temp(zip_path: str):
-    temp_dir = tempfile.mkdtemp(suffix="unit_assembler")
+def load_zip_to_temp(zip_path: str|Path, target_path:str|Path):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
-        zip_ref.extractall(temp_dir)
-    return Path(temp_dir)
-
-def remove_temp(temp_dir: str|Path):
-    shutil.rmtree(temp_dir)
+        zip_ref.extractall(target_path)
+    return Path(target_path)
