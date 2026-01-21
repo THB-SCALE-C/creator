@@ -1,6 +1,6 @@
-from .test.text import Text
-from .test.cloze import ClozeTest
-from .test.single_choice import SingleChoice
+from .base.text import Text
+from .base.cloze import ClozeTest
+from .base.single_choice import SingleChoice
 
 __all__ = [
     "Text",

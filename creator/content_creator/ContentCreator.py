@@ -5,9 +5,9 @@ import dspy
 from dspy import Signature, Prediction, ChainOfThought, Module
 
 from creator.unit_assembler.UnitAssembler import UnitAssembler
-from ..dspy_components.test.cloze import ClozeTest
-from ..dspy_components.test.single_choice import SingleChoice
-from ..dspy_components.test.text import Text
+from ..dspy_components.base.cloze import ClozeTest
+from ..dspy_components.base.single_choice import SingleChoice
+from ..dspy_components.base.text import Text
 from ..lib.types import SignatureSlide
 from ..lib.vis import render_learning_content
 from ..llm import OPENROUTER_DSPY_LM_CONFIG

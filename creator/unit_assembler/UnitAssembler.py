@@ -135,13 +135,3 @@ class UnitAssembler:
             return output_path
         finally:
             remove_temp(cls.template_path)
-
-
-# def _load_jinja_templates_from_dir(
-#     root_folder: str | Path = "",
-# ) -> dict[str, Template]:
-#     templates = {}
-#     env = Environment(loader=FileSystemLoader(root_folder))
-#     for tmplt in env.list_templates():
-#         templates[tmplt.split(".")[0]] = env.get_template(tmplt)
-#     return templates

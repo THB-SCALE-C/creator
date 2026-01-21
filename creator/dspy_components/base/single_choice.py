@@ -1,15 +1,15 @@
-from dspy import Signature, OutputField
+from pydantic import BaseModel
 
 
-class _Question(Signature):
-    question: str = OutputField()
-    correct_answer: str = OutputField()
-    wrong_answers: list[str] = OutputField()
+class Question(BaseModel):
+    question: str
+    correct_answer: str 
+    wrong_answers: list[str]
 
 
-class SingleChoice(Signature):
-    title: str = OutputField()
-    questions: list[_Question] = OutputField()
-    tip: str = OutputField()
-    positive_feedback: str = OutputField()
-    negative_feedback: str = OutputField()
+class SingleChoice(BaseModel):
+    title: str
+    questions: list[Question]
+    tip: str
+    positive_feedback: str
+    negative_feedback: str
