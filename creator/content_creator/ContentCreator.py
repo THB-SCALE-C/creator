@@ -54,9 +54,10 @@ class CreatorOutput:
         _slides = _to_json(self.pred.slides)
         return {**self.pred.toDict(), "slides": _slides}  # type:ignore
 
-    def to_h5p(self, output_dir=".out", out_name="unit.h5p"):
+    def to_h5p(self, output_dir=".out", out_name="unit.h5p", template_path: str | None = None):
         if not self.pred:
             raise ValueError("No learning unit created. Create first.")
+        UnitAssembler.set_config(template_path)
         content = self.to_dict()
         assembled_content = UnitAssembler.assemble_content(content)
         assembled_unit_path = UnitAssembler.assemble_h5p(
@@ -128,7 +129,8 @@ class ContentCreator:
             _types = tuple([MAP_R[slide["type"]] for slide in slides])
             _slide_type = Union[_types]
             self._lu_sig = self._default_unit.insert(-1, "slides",
-                                                     dspy.OutputField(desc=f"For the possible slides types, take in regard these instructions:\n\n {"\n\n".join([f'##{slide["name"]}\n{slide["desc"]}' for slide in slides])}"), 
+                                                     dspy.OutputField(
+                                                         desc=f"For the possible slides types, take in regard these instructions:\n\n {"\n\n".join([f'##{slide["name"]}\n{slide["desc"]}' for slide in slides])}"),
                                                      list[_slide_type])
         else:
             self._lu_sig = self._default_unit.insert(-1, "slides",

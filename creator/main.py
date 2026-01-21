@@ -9,9 +9,10 @@ from .lib.types import AssemblerConfig, SignatureSlide
 class Creator:
 
     @classmethod
-    def assemble_unit_with_content(cls, content:dict[str,Any]|None,output_dir=".out",out_name="unit.h5p", buffer=False):
+    def assemble_unit_with_content(cls, content:dict[str,Any]|None,output_dir=".out",out_name="unit.h5p", buffer=False, template_path:str|None=None):
         if not content:
             raise ValueError("No learning unit created. Create first.")
+        UnitAssembler.set_config(template_path=template_path)
         presentation = UnitAssembler.assemble_content(content)
         assembled_unit_path = UnitAssembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
@@ -21,8 +22,9 @@ class Creator:
         return CreatorOutput(prediction)
     
     @classmethod
-    def assemble_unit_from_prediction(cls,prediction:Prediction,output_dir=".out",out_name="unit.h5p", buffer=False):
+    def assemble_unit_from_prediction(cls,prediction:Prediction,output_dir=".out",out_name="unit.h5p", buffer=False, template_path:str|None=None):
         unit = CreatorOutput(prediction)
+        UnitAssembler.set_config(template_path=template_path)
         presentation = UnitAssembler.assemble_content(unit.to_dict())
         assembled_unit_path = UnitAssembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
@@ -37,7 +39,7 @@ class Creator:
         
         self._content_creator = ContentCreator(model_props=model_props)
         self._unit_assembler = UnitAssembler
-        self._unit_assembler.set_config(unit_assembler_props)
+        self._unit_assembler.set_config(unit_assembler_props) # type: ignore
         if signature_class:
             self._content_creator.set_lu_signature(signature_class)
         elif slide_dicts:
@@ -63,12 +65,12 @@ class Creator:
         return self.unit
 
 
-    def assemble_unit(self,output_dir=".out",out_name="unit.h5p"):
-        if not self.unit:
-            raise ValueError("No learning unit created. Create first.")
-        content = self.unit.to_dict()
-        assembled_unit_path = self.assemble_unit_with_content(content,output_dir,out_name)
-        return assembled_unit_path
+    # def assemble_unit(self,output_dir=".out",out_name="unit.h5p", template_path:str|None=None):
+    #     if not self.unit:
+    #         raise ValueError("No learning unit created. Create first.")
+    #     content = self.unit.to_dict()
+    #     assembled_unit_path = self.assemble_unit_with_content(content,output_dir,out_name,template_path=template_path)
+    #     return assembled_unit_path
     
     @property
     def history(self):

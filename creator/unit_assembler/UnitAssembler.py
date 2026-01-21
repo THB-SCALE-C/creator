@@ -27,6 +27,7 @@ class UnitAssembler:
     _config: AssemblerConfig | None = None
     _unit_template_path: Path | None = None
     _jinja_templates_path: Path | None = None
+    template_path:Path|None = None
 
     @classmethod
     def set_config(cls, template_path: str | None = None, config: AssemblerConfig | dict[str, Any] = {}) -> None:
@@ -40,7 +41,7 @@ class UnitAssembler:
                 cls.template_path  = load_zip_to_temp(template_path,TEMPLATE_PATH_TEMP)
             else:
                 cls.template_path = Path(template_path)
-        else:
+        elif not cls.template_path:
             if TEMPLATE_PATH_TEMP.exists() and TEMPLATE_PATH_TEMP.is_dir():
                 cls.template_path = TEMPLATE_PATH_TEMP
             else:
@@ -66,6 +67,9 @@ class UnitAssembler:
         cls._ensure_initialized()
         if cls._config is None:
             raise RuntimeError("UnitAssembler is not initialized.")
+        
+        if not cls.template_path:
+            raise RuntimeError("No template path found.")
         
         if not cls._jinja_templates_path:
             raise RuntimeError("No template path found.")
