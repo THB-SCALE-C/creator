@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Any
 from dspy import Signature,Module,Prediction
 from .unit_assembler.UnitAssembler import UnitAssembler
-from .content_creator.ContentCreator import ContentCreator, CreatorOutput
+from .content_creator.ContentCreator import ContentCreator
+from .unit.unit import Unit
 from .lib.types import AssemblerConfig, SignatureSlide
 
 
@@ -12,21 +13,21 @@ class Creator:
     def assemble_unit_with_content(cls, content:dict[str,Any]|None,output_dir=".out",out_name="unit.h5p", buffer=False, template_path:str|None=None):
         if not content:
             raise ValueError("No learning unit created. Create first.")
-        UnitAssembler.set_config(template_path=template_path)
-        presentation = UnitAssembler.assemble_content(content)
-        assembled_unit_path = UnitAssembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
+        assembler = UnitAssembler(template_path=template_path)
+        presentation = assembler.assemble_content(content)
+        assembled_unit_path = assembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
         
     @classmethod
     def create_unit_from_prediction(cls,prediction:Prediction):
-        return CreatorOutput(prediction)
+        return Unit(prediction)
     
     @classmethod
     def assemble_unit_from_prediction(cls,prediction:Prediction,output_dir=".out",out_name="unit.h5p", buffer=False, template_path:str|None=None):
-        unit = CreatorOutput(prediction)
-        UnitAssembler.set_config(template_path=template_path)
-        presentation = UnitAssembler.assemble_content(unit.to_dict())
-        assembled_unit_path = UnitAssembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
+        unit = Unit(prediction)
+        assembler = UnitAssembler(template_path=template_path)
+        presentation = assembler.assemble_content(unit.to_dict())
+        assembled_unit_path = assembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
 
     def __init__(self, 
@@ -38,8 +39,7 @@ class Creator:
                  **model_props) -> None:
         
         self._content_creator = ContentCreator(model_props=model_props)
-        self._unit_assembler = UnitAssembler
-        self._unit_assembler.set_config(unit_assembler_props) # type: ignore
+        self._unit_assembler = UnitAssembler(config=unit_assembler_props)
         if signature_class:
             self._content_creator.set_lu_signature(signature_class)
         elif slide_dicts:

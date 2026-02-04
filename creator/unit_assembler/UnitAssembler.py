@@ -20,69 +20,83 @@ from . import preprocess
 BASE_PATH = Path(__file__).resolve(
 ).parent
 
-DEFAULT_TEMPLATE_UNPACKED_PATH = BASE_PATH / Path("resources/templates/default.zip")
+DEFAULT_TEMPLATE_UNPACKED_PATH = BASE_PATH / \
+    Path("resources/templates/default.zip")
 TEMPLATE_PATH_TEMP = BASE_PATH / Path("resources/templates/.temp")
 
+
 class UnitAssembler:
-    _config: AssemblerConfig | None = None
-    _unit_template_path: Path | None = None
-    _jinja_templates_path: Path | None = None
-    template_path:Path|None = None
+    def __init__(
+        self,
+        template_path: str | None = None,
+        config: AssemblerConfig | dict[str, Any] | None = None,
+    ) -> None:
+        self._config: AssemblerConfig | None = None
+        self._unit_template_path: Path | None = None
+        self._jinja_templates_path: Path | None = None
+        self.template_path: Path | None = None
+        self._jinja_env: Environment | None = None
+        self._jinja_entry_point = None
+        self.set_config(config=config)
+        self.set_template_path(template_path=template_path,)
 
-    @classmethod
-    def set_config(cls, template_path: str | None = None, config: AssemblerConfig | dict[str, Any] = {}) -> None:
-        cls._ensure_initialized(template_path=template_path, config=config)
-
-    @classmethod
-    def _ensure_initialized(cls, template_path: str | None = None, config: AssemblerConfig | dict[str, Any] | None = None) -> None:
-        # cls.template_path = DEFAULT_TEMPLATE_PATH
+    def set_template_path(
+        self,
+        template_path: str | None = None,
+    ) -> None:
+        # self.template_path = DEFAULT_TEMPLATE_PATH
         if template_path:
             if template_path.endswith(".zip"):
-                cls.template_path  = load_zip_to_temp(template_path,TEMPLATE_PATH_TEMP)
+                self.template_path = load_zip_to_temp(
+                    template_path, TEMPLATE_PATH_TEMP)
             else:
-                cls.template_path = Path(template_path)
-        elif not cls.template_path:
+                self.template_path = Path(template_path)
+        else:
             if TEMPLATE_PATH_TEMP.exists() and TEMPLATE_PATH_TEMP.is_dir():
-                cls.template_path = TEMPLATE_PATH_TEMP
+                self.template_path = TEMPLATE_PATH_TEMP
             else:
-                cls.template_path  = load_zip_to_temp(DEFAULT_TEMPLATE_UNPACKED_PATH,TEMPLATE_PATH_TEMP)
-        cls._unit_template_path = cls.template_path / Path("unit")
-        cls._jinja_templates_path = cls.template_path / Path("jinja")
-        cls._jinja_env = Environment(
-            loader=FileSystemLoader(str(cls._jinja_templates_path))
+                self.template_path = load_zip_to_temp(
+                    DEFAULT_TEMPLATE_UNPACKED_PATH, TEMPLATE_PATH_TEMP
+                )
+        self._unit_template_path = self.template_path / Path("unit")
+        self._jinja_templates_path = self.template_path / Path("jinja")
+        self._jinja_env = Environment(
+            loader=FileSystemLoader(str(self._jinja_templates_path))
         )
-        cls._jinja_entry_point = cls._jinja_env.get_template("main.j2")
+        self._jinja_entry_point = self._jinja_env.get_template("main.j2")
 
-        if cls._config is not None and config is None:
-            return
+    def set_config(self,
+                   config: AssemblerConfig | dict[str, Any] | None = None):
 
-        cls._config = load_yaml(BASE_PATH / "config.yml")
+        self._config = load_yaml(BASE_PATH / "config.yml")
 
         if config:
-            cls._config.update(config)  # type: ignore
+            self._config.update(config)  # type: ignore
 
+    def assemble_content(self, intermediate_content: dict[str, Any]) -> str:
 
-    @classmethod
-    def assemble_content(cls, intermediate_content: dict[str, Any]) -> str:
-        cls._ensure_initialized()
-        if cls._config is None:
+        if self._config is None:
             raise RuntimeError("UnitAssembler is not initialized.")
-        
-        if not cls.template_path:
+
+        if not self.template_path:
             raise RuntimeError("No template path found.")
-        
-        if not cls._jinja_templates_path:
+
+        if not self._jinja_templates_path:
             raise RuntimeError("No template path found.")
+
+        if not self._jinja_entry_point:
+            raise ValueError("No jinja entry point found. Provide `main.j2`.")
+
         final_slides = []
 
         # get unit tile for cover page
         unit_title = intermediate_content.get(
-            "title", cls._config["defaults"]["unit_title"])
+            "title", self._config["defaults"]["unit_title"])
 
         # render slide content as elements
         for slide_conf in intermediate_content.get("slides", []):
             slide_type = slide_conf["type"]
-            slide_template_config = cls._config["slide_types"][slide_type]
+            slide_template_config = self._config["slide_types"][slide_type]
             element_conf = {"uuid": str(uuid.uuid1())}
 
             preprocess_fn_name = slide_template_config.get("preprocess", None)
@@ -95,34 +109,40 @@ class UnitAssembler:
                 element_conf.update(slide_conf)
             final_slides.append(element_conf)
 
-        presentation_conf =  {"slides": final_slides, "title": unit_title}
+        presentation_conf = {"slides": final_slides, "title": unit_title}
 
-        valid_path = cls.template_path / "valid.py"
+        valid_path = self.template_path / "valid.py"
         if valid_path:
-            spec = importlib.util.spec_from_file_location("unit_template_valid", valid_path)
+            spec = importlib.util.spec_from_file_location(
+                "unit_template_valid", valid_path)
             if spec is None or spec.loader is None:
-                raise RuntimeError(f"Unable to load validator from {valid_path}.")
+                raise RuntimeError(
+                    f"Unable to load validator from {valid_path}.")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             _validator = module.Main
             _validator(**presentation_conf)  # type: ignore[misc]
 
         # manufacture the final presentation
-        presentation = cls._jinja_entry_point.render(**presentation_conf)
+        presentation = self._jinja_entry_point.render(**presentation_conf)
         return presentation
 
-    @classmethod
-    def assemble_h5p(cls, presentation: str, output_dir: str | Path = ".out", out_name: str = "unit.h5p", return_buffer=False):
-        cls._ensure_initialized()
-        if cls._unit_template_path is None:
-            raise RuntimeError("UnitAssembler is not initialized.")
+    def assemble_h5p(
+        self,
+        presentation: str,
+        output_dir: str | Path = ".out",
+        out_name: str = "unit.h5p",
+        return_buffer: bool = False,
+    ):
+        if self._unit_template_path is None:
+            raise RuntimeError("No template path provided; might not be initialized.")
 
         contents = [{
             "filename": "content.json",
             "path": "content",
             "content": presentation
         }]
-        zip_path = cls._unit_template_path
+        zip_path = self._unit_template_path
         buffer = zip_folder(str(zip_path), contents=contents)  # type: ignore
         if return_buffer:
             return buffer

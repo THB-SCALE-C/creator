@@ -3,14 +3,15 @@ from typing import Any, Type, Union
 from warnings import warn
 import dspy
 from dspy import Signature, Prediction, ChainOfThought, Module
+from llm.provider.openrouter import OpenrouterLM
 
+from creator.unit.unit import Unit
 from creator.unit_assembler.UnitAssembler import UnitAssembler
 from ..dspy_components.base.cloze import ClozeTest
 from ..dspy_components.base.single_choice import SingleChoice
 from ..dspy_components.base.text import Text
 from ..lib.types import SignatureSlide
 from ..lib.vis import render_learning_content
-from ..llm import OPENROUTER_DSPY_LM_CONFIG
 
 MAP = {
     "Text": "text",
@@ -35,46 +36,42 @@ class REWORK_LEARNING_UNIT(dspy.Signature):
     title: str = dspy.OutputField()
 
 
-class CreatorOutput:
-    def __init__(self, pred: Prediction | ChainOfThought) -> None:
-        self.pred = pred
+# class CreatorOutput:
+#     def __init__(self, pred: Prediction | ChainOfThought) -> None:
+#         self.pred = pred
 
-    def __repr__(self) -> str:
-        return self.pred.__repr__()
+#     def __repr__(self) -> str:
+#         return self.pred.__repr__()
 
-    def to_html(self):
-        return render_learning_content(self.to_dict())
+#     def to_html(self):
+#         return render_learning_content(self.to_dict())
 
-    def to_dict(self):
-        if not self.pred:
-            raise ValueError("No prediction object found. Invoke first.")
-        if not self.pred.slides:
-            raise ValueError(
-                "No slides object found. Incomplete learning unit.")
-        _slides = _to_json(self.pred.slides)
-        return {**self.pred.toDict(), "slides": _slides}  # type:ignore
+#     def to_dict(self):
+#         if not self.pred:
+#             raise ValueError("No prediction object found. Invoke first.")
+#         if not self.pred.slides:
+#             raise ValueError(
+#                 "No slides object found. Incomplete learning unit.")
+#         _slides = _to_json(self.pred.slides)
+#         return {**self.pred.toDict(), "slides": _slides}  # type:ignore
 
-    def to_h5p(self, output_dir=".out", out_name="unit.h5p", template_path: str | None = None):
-        if not self.pred:
-            raise ValueError("No learning unit created. Create first.")
-        UnitAssembler.set_config(template_path)
-        content = self.to_dict()
-        assembled_content = UnitAssembler.assemble_content(content)
-        assembled_unit_path = UnitAssembler.assemble_h5p(
-            assembled_content, output_dir, out_name)
-        return assembled_unit_path
+#     def to_h5p(self, output_dir=".out", out_name="unit.h5p", template_path: str | None = None):
+#         if not self.pred:
+#             raise ValueError("No learning unit created. Create first.")
+#         assembler = UnitAssembler(template_path=template_path)
+#         content = self.to_dict()
+#         assembled_content = assembler.assemble_content(content)
+#         assembled_unit_path = assembler.assemble_h5p(
+#             assembled_content, output_dir, out_name)
+#         return assembled_unit_path
 
 
 class ContentCreator:
-    def __init__(self, model_id: str = "openrouter/openai/gpt-oss-120b", **model_props) -> None:
+    def __init__(self, model_id: str = "openai/gpt-oss-120b", **model_props) -> None:
         self._lu_sig = None
         self._output = None
         self.predictor = None
-        self.LM = dspy.LM(
-            **OPENROUTER_DSPY_LM_CONFIG,
-            **model_props,
-            model=model_id,
-        )
+        self.LM = OpenrouterLM(model_id, **model_props)
         self._default_unit = LEARNING_UNIT
 
     def invoke(self, topic: str, **kwargs):
@@ -85,7 +82,7 @@ class ContentCreator:
         _out = self.predictor(topic=topic, **kwargs)
         if not _out:
             raise ValueError("No output.")
-        self._output = CreatorOutput(_out)
+        self._output = Unit(_out)
         return self._output
 
     def enable_cot(self):
@@ -161,19 +158,6 @@ class ContentCreator:
         self.predictor.set_lm(self.LM)
 
 
-def _to_json(slides: list[Any] | Any, map=MAP):
-    _slides = []
-    for slide in slides if isinstance(slides, list) else dict(slides).values():
-        if isinstance(slide, list):
-            _slides.extend([{**dict(s), "type": map[s.__class__.__name__]}
-                            for s in slide])
-        else:
-            _slide = {**dict(slide), "type": map[slide.__class__.__name__]}
-            _slides.append(_slide)
-        # recursivly parsing signature and signature members to nested dict
-        _slides = [_parse_to_dict(s) for s in _slides]
-    return _slides
-
 
 def _to_signature(data: list[Any] | dict[str, Any], name: str = "Slides") -> Type[Signature]:
     class Wrapper(Signature):
@@ -194,11 +178,3 @@ def _to_signature(data: list[Any] | dict[str, Any], name: str = "Slides") -> Typ
     return sig
 
 
-def _parse_to_dict(slide):
-    if isinstance(slide, list):
-        return [_parse_to_dict(v) for v in slide]
-    if isinstance(slide, dict):
-        return {k: _parse_to_dict(v) for k, v in slide.items()}
-    if hasattr(slide, "__dict__"):
-        return {k: _parse_to_dict(v) for k, v in dict(slide).items()}
-    return slide
