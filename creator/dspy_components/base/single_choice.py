@@ -1,3 +1,4 @@
+from typing import ClassVar
 from pydantic import BaseModel
 
 
@@ -8,6 +9,7 @@ class Question(BaseModel):
 
 
 class SingleChoice(BaseModel):
+    slide_type:ClassVar = "single_choice"
     title: str
     questions: list[Question]
     tip: str
