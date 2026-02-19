@@ -22,7 +22,7 @@ BASE_PATH = Path(__file__).resolve(
 
 DEFAULT_TEMPLATE_UNPACKED_PATH = BASE_PATH / \
     Path("resources/templates/default.zip")
-TEMPLATE_PATH_TEMP = BASE_PATH / Path("resources/templates/.temp")
+TEMPLATE_PATH_TEMP = Path(".temp/creator/unit")
 
 
 class UnitAssembler:
@@ -151,3 +151,7 @@ class UnitAssembler:
         output_path = output_dir / out_name
         output_path.write_bytes(buffer)
         return output_path
+
+    @classmethod
+    def delete_temp_folder(cls):
+        os.removedirs(TEMPLATE_PATH_TEMP)

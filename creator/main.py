@@ -9,6 +9,7 @@ from .lib.types import AssemblerConfig, SignatureSlide
 
 class Creator:
 
+    ### CLASS METHODS
     @classmethod
     def assemble_unit_with_content(cls, content:dict[str,Any]|None,output_dir=".out",out_name="unit.h5p", buffer=False, template_path:str|None=None):
         if not content:
@@ -29,7 +30,12 @@ class Creator:
         presentation = assembler.assemble_content(unit.to_dict())
         assembled_unit_path = assembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
+    
+    @classmethod
+    def delete_temp_unit_folder(cls) -> None:
+        UnitAssembler.delete_temp_folder()
 
+    ### INSTANCE CONFIGURATION
     def __init__(self, 
                  unit_assembler_props: AssemblerConfig|dict[str,Any]={}, 
                  signature_class: type[Signature] | None = None, 
