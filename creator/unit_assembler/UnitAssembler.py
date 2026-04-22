@@ -5,8 +5,6 @@ from contextlib import contextmanager
 import importlib.util
 import os
 from pathlib import Path
-import shutil
-import tempfile
 from typing import Any
 from warnings import warn
 from jinja2 import Environment, FileSystemLoader
@@ -14,8 +12,6 @@ import uuid
 from ..lib.loader import load_yaml
 from ..lib.types import AssemblerConfig
 from ..lib.zip_folder import load_zip_to_temp, zip_folder
-from . import preprocess
-
 
 BASE_PATH = Path(__file__).resolve(
 ).parent
@@ -31,13 +27,11 @@ class UnitAssembler:
         template_path: str | None = None,
         config: AssemblerConfig | dict[str, Any] | None = None,
     ) -> None:
-        self._config: AssemblerConfig | None = None
         self._unit_template_path: Path | None = None
         self._jinja_templates_path: Path | None = None
         self.template_path: Path | None = None
         self._jinja_env: Environment | None = None
         self._jinja_entry_point = None
-        self.set_config(config=config)
         self.set_template_path(template_path=template_path,)
 
     def set_template_path(
@@ -65,18 +59,7 @@ class UnitAssembler:
         )
         self._jinja_entry_point = self._jinja_env.get_template("main.j2")
 
-    def set_config(self,
-                   config: AssemblerConfig | dict[str, Any] | None = None):
-
-        self._config = load_yaml(BASE_PATH / "config.yml")
-
-        if config:
-            self._config.update(config)  # type: ignore
-
     def assemble_content(self, intermediate_content: dict[str, Any]) -> str:
-
-        if self._config is None:
-            raise RuntimeError("UnitAssembler is not initialized.")
 
         if not self.template_path:
             raise RuntimeError("No template path found.")
@@ -91,23 +74,23 @@ class UnitAssembler:
 
         # get unit tile for cover page
         unit_title = intermediate_content.get(
-            "title", self._config["defaults"]["unit_title"])
+            "title", "unit")
 
         # render slide content as elements
-        for slide_conf in intermediate_content.get("slides", []):
-            slide_type = slide_conf["type"]
-            slide_template_config = self._config["slide_types"][slide_type]
-            element_conf = {"uuid": str(uuid.uuid1())}
-
-            preprocess_fn_name = slide_template_config.get("preprocess", None)
-            if preprocess_fn_name:
-                preprocess_fn = getattr(
-                    preprocess, preprocess_fn_name)
-                _slide = preprocess_fn(slide_conf)
-                element_conf.update(_slide)
-            else:
-                element_conf.update(slide_conf)
+        for slide in intermediate_content.get("slides", []):
+            element_conf = {"uuid": str(uuid.uuid1()), **slide}
             final_slides.append(element_conf)
+
+            # slide_type = slide_conf["type"]
+            # slide_template_config = self._config["slide_types"][slide_type]
+            # preprocess_fn_name = slide_template_config.get("preprocess", None)
+            # if preprocess_fn_name:
+            #     preprocess_fn = getattr(
+            #         preprocess, preprocess_fn_name)
+            #     _slide = preprocess_fn(slide_conf)
+            #     element_conf.update(_slide)
+            # else:
+            # element_conf.update(slide_conf)
 
         presentation_conf = {"slides": final_slides, "title": unit_title}
 
