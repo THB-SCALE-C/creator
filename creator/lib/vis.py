@@ -1,51 +1,92 @@
 from IPython.display import HTML
+import re
 
 def render_learning_content(data):
+    blank_pattern = re.compile(r"\*([^*]+)\*")
+
     html = []
+    append = html.append
 
     # Basic CSS for readability in Jupyter
-    html.append("""
+    append("""
     <style>
-        .course { font-family: Arial, sans-serif; line-height: 1.6; }
-        .slide { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+        .course { font-family: Arial, sans-serif; line-height: 1.6;}
+        .slide { border: 1px solid #333; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
         .slide h2 { margin-top: 0; }
         .quiz-question { margin-bottom: 12px; }
         .quiz-answers li { margin-left: 20px; }
-        .tip { background: #f5f7fa; padding: 10px; border-left: 4px solid #4a90e2; margin-top: 12px; }
+        .tip { background: #f5f7fa; padding: 10px; border-left: 4px solid #4a90e2; margin-top: 12px; color: #000000;}
         .correct { color: #22ae35; }
+        .feedback-positive { background: #eef9f0; padding: 10px; border-left: 4px solid #22ae35; margin-top: 12px; color: #000000; }
+        .feedback-negative { background: #fff1f1; padding: 10px; border-left: 4px solid #d64545; margin-top: 12px; color: #000000;}
         .instruct {}
         .cloze {}
+        .blank-box {
+            display: inline-block;
+            min-width: 80px;
+            padding: 0 8px;
+            margin: 0 2px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            text-align: center;
+            vertical-align: baseline;
+        }
     </style>
     """)
 
-    html.append(f"<div class='course'><h1>{data.get('title','')}</h1>")
+    append(f"<div class='course'><h1>{data.get('title','')}</h1>")
 
     for slide in data.get("slides", []):
-        html.append("<div class='slide'>")
-        html.append(f"<h2>{slide.get('title','')}</h2>")
+        append("<div class='slide'>")
+        append(f"<h2>{slide.get('title','')}</h2>")
 
-        if slide.get("type") == "text":
-            html.append(slide.get("text", ""))
+        slide_type = slide.get("slide_type") or slide.get("type")
 
-        elif slide.get("type") == "single_choice":
-            for i, q in enumerate(slide.get("questions", []), 1):
-                html.append(f"<div class='quiz-question'><strong>{i}. {q['question']}</strong>")
-                html.append("<ul class='quiz-answers'>")
+        if slide_type == "text":
+            append(slide.get("text", ""))
 
-                answers = [q["correct_answer"]] + q.get("wrong_answers", [])
-                for i,ans in enumerate(answers):
-                    html.append(f"<li class='{i==0 and "correct"}'>{ans}</li>")
+        elif slide_type == "single_choice":
+            items = slide.get("question_items") or slide.get("questions") or []
+            for q_idx, q in enumerate(items, 1):
+                question = q.get("question", "")
+                append(f"<div class='quiz-question'><strong>{q_idx}. {question}</strong>")
+                append("<ul class='quiz-answers'>")
 
-                html.append("</ul></div>")
+                answers = [q.get("correct_answer", "")] + (q.get("wrong_answers") or [])
+                for a_idx, ans in enumerate(answers):
+                    css = "correct" if a_idx == 0 else ""
+                    append(f"<li class='{css}'>{ans}</li>")
+
+                append("</ul></div>")
 
             if slide.get("tip"):
-                html.append(f"<div class='tip'><strong>Tipp:</strong> {slide['tip']}</div>")
+                append(f"<div class='tip'><strong>Tipp:</strong> {slide['tip']}</div>")
+            if slide.get("positive_feedback"):
+                append(
+                    f"<div class='feedback-positive'><strong>Positive Feedback:</strong> {slide['positive_feedback']}</div>"
+                )
+            if slide.get("negative_feedback"):
+                append(
+                    f"<div class='feedback-negative'><strong>Negative Feedback:</strong> {slide['negative_feedback']}</div>"
+                )
 
-        elif slide.get("type") == "drag_text":
-            html.append(f"<p class='instruct'><strong>{slide["user_instruction"]}</strong></p>")
-            html.append(f"<p class='cloze'>{slide["cloze_text"]}</p>")
-            
-        html.append("</div>")
+        elif slide_type == "drag_text":
+            append(f"<p class='instruct'><strong>{slide.get('user_instruction', '')}</strong></p>")
+            cloze_text = slide.get("cloze_text", "")
+            cloze_text = blank_pattern.sub(
+                lambda m: f"<span class='blank-box' data-answer='{m.group(1)}'>{m.group(1)}</span>",
+                cloze_text,
+            )
+            append(f"<p class='cloze'>{cloze_text}</p>")
+            distractors = slide.get("distractors") or []
+            if distractors:
+                append("<div><strong>Distractors:</strong> " + ", ".join(distractors) + "</div>")
 
-    html.append("</div>")
+        evidences = slide.get("evidences") or []
+        if evidences:
+            append("<div class='tip'><strong>Evidence:</strong> " + ", ".join(map(str, evidences)) + "</div>")
+
+        append("</div>")
+
+    append("</div>")
     return HTML("".join(html))
