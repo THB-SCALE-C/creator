@@ -1,5 +1,6 @@
 from typing import ClassVar
 from pydantic import BaseModel
+from creator.schemas.base import BaseComponent
 
 
 class Item(BaseModel):
@@ -8,7 +9,7 @@ class Item(BaseModel):
     wrong_answers: list[str]
 
 
-class SingleChoice(BaseModel):
+class SingleChoice(BaseComponent):
     slide_type:ClassVar = "single_choice"
     title: str
     question_items: list[Item]
