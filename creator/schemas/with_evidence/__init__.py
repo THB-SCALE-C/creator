@@ -1,13 +1,13 @@
 from typing import Union
-from .text import Text
-from .drag_text import DragText
-from .single_choice import SingleChoice
+from .text import TextWithEvidence
+from .drag_text import DragTextWithEvidences
+from .single_choice import SingleChoiceWithEvidence
 
-SlideTypeUnion = Union[Text,DragText,SingleChoice]
+SlideTypeUnion = Union[TextWithEvidence,DragTextWithEvidences,SingleChoiceWithEvidence]
 
 __all__ = [
-    "Text",
-    "DragText",
-    "SingleChoice",
+    "TextWithEvidence",
+    "DragTextWithEvidences",
+    "SingleChoiceWithEvidence",
     "SlideTypeUnion"
 ]
