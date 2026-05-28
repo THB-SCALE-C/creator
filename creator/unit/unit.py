@@ -4,7 +4,7 @@ from creator.schemas.base import BaseComponent
 from creator.unit_assembler.UnitAssembler import UnitAssembler
 from creator.schemas.simple import Text, DragText, SingleChoice
 from creator.schemas.with_evidence.text import TextWithEvidence
-from creator.schemas.with_evidence.drag_text import DragTextWithEvidences
+from creator.schemas.with_evidence.drag_text import DragTextWithEvidence
 from creator.schemas.with_evidence.single_choice import SingleChoiceWithEvidence
 from ..lib.vis import render_learning_content
 
@@ -21,7 +21,7 @@ class Unit(Prediction):
         }
         slide_types_with_evidence = {
             "text": TextWithEvidence,
-            "drag_text": DragTextWithEvidences,
+            "drag_text": DragTextWithEvidence,
             "single_choice": SingleChoiceWithEvidence,
         }
         slides = []

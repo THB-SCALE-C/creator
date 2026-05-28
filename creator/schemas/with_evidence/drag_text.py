@@ -4,6 +4,6 @@ from creator.schemas.simple.drag_text import DragText
 
 
 
-class DragTextWithEvidences(DragText):
+class DragTextWithEvidence(DragText):
     evidences:list = Field(description="A list of document IDs that support your statements for this slide. Leave empty if no relevant statements are made.", default_factory=list)
 
