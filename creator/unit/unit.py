@@ -43,7 +43,7 @@ class Unit(Prediction):
     def to_html(self):
         return render_learning_content(self.to_dict())
 
-    def to_dict(self, exclude_computed_fields:bool=True):
+    def to_dict(self, exclude_computed_fields:bool=False):
         slides = getattr(self,"slides", None)
         if not slides:
             raise ValueError(
