@@ -44,8 +44,8 @@ class Unit(Prediction):
             slides.append(slide_cls.model_validate(raw_slide))
         return cls(slides=slides, title=title)
 
-    def __init__(self, slides: List[BaseComponent], title: str, *args, **kwargs) -> None:
-        super().__init__(slides=slides, title=title, *args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__( *args, **kwargs)
 
     def to_html(self):
         return render_learning_content(self.to())
