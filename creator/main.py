@@ -36,7 +36,7 @@ class ContentCreator(dspy.Module):
         """Create and assemble an H5P unit from a DSPy ``Prediction``."""
         unit = Unit(**prediction)
         assembler = UnitAssembler(template_path=template_path)
-        presentation = assembler.assemble_content(unit.to_dict())
+        presentation = assembler.assemble_content(unit.to())
         assembled_unit_path = assembler.assemble_h5p(presentation, output_dir=output_dir, out_name=out_name,return_buffer=buffer)
         return assembled_unit_path
     

@@ -1,4 +1,6 @@
 from typing import ClassVar
+
+from pydantic import computed_field
 from creator.schemas.base import BaseComponent
 
 class Text(BaseComponent):
