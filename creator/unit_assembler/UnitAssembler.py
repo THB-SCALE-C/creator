@@ -81,30 +81,7 @@ class UnitAssembler:
             element_conf = {"uuid": str(uuid.uuid1()), **slide}
             final_slides.append(element_conf)
 
-            # slide_type = slide_conf["type"]
-            # slide_template_config = self._config["slide_types"][slide_type]
-            # preprocess_fn_name = slide_template_config.get("preprocess", None)
-            # if preprocess_fn_name:
-            #     preprocess_fn = getattr(
-            #         preprocess, preprocess_fn_name)
-            #     _slide = preprocess_fn(slide_conf)
-            #     element_conf.update(_slide)
-            # else:
-            # element_conf.update(slide_conf)
-
         presentation_conf = {"slides": final_slides, "title": unit_title}
-
-        valid_path = self.template_path / "valid.py"
-        if valid_path:
-            spec = importlib.util.spec_from_file_location(
-                "unit_template_valid", valid_path)
-            if spec is None or spec.loader is None:
-                raise RuntimeError(
-                    f"Unable to load validator from {valid_path}.")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            _validator = module.Main
-            _validator(**presentation_conf)  # type: ignore[misc]
 
         # manufacture the final presentation
         presentation = self._jinja_entry_point.render(**presentation_conf)
